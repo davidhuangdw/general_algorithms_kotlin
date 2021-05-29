@@ -141,7 +141,7 @@ class Calculator{
 
 class TestCalculator{
     @Test
-    fun test1(){
+    fun testCalculator1(){
         val exp = "1 +4 *3 /6 + 3+(5+6)*10*(1+1)"
         val cal = Calculator()
         println(cal.convertToSuffixFormat(exp))
@@ -150,14 +150,14 @@ class TestCalculator{
     }
 
     @Test
-    fun test2() {
+    fun testCalculator2() {
         val exp = "---1 + 4*3/--6 + -3 + (-(5+6)) * -10 * (1+1)"
         val cal = Calculator()
         assertEquals(218, cal.compute(exp))
     }
 
     @Test
-    fun test3(){
+    fun testCalculator3(){
         val cal = Calculator()
         assertThrows<RuntimeException> { // illegal multiple ops '+*'
             cal.compute("1 +4 *3 /6 + *3+(5+6)*10*(1+1)")

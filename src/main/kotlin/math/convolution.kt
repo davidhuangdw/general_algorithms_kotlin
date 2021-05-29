@@ -112,7 +112,7 @@ class FastFourierTransform{
 
 class TestFastFourierTransform{
     @Test
-    fun test1(){
+    fun testFastFourierTransform1(){
         val f = FastFourierTransform()
         assertEquals(listOf(3, 17, 10 , 0), f.convolution(listOf(3,2), listOf(1,5)))
     }

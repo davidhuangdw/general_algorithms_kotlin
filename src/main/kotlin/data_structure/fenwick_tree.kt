@@ -23,9 +23,9 @@ class FenwickTree(val N: Int){
     }
 }
 
-class TestFenwickTree1{
+class TestFenwickTree{
     @Test
-    fun test1(){
+    fun testFenwickTree1(){
         val tree = FenwickTree(10)
         for(i in 1..10)
             tree.add(i, i)
