@@ -1,5 +1,6 @@
 package graph
 
+import data_structure.MinHeapSetWithCmp
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.*
@@ -41,18 +42,33 @@ class ShortestPath {
         // O(m*log), or findMin by array: O(n^2) (by fibonacci-heap: O(m+n*log), how?)
         val n = adj.size
         val shortest = MutableList(n) { INF_DIS }
-        val que = PriorityQueue<Pair<Int, Int>>(compareBy({ it.first }, { it.second }))
-        que.add(0 to src)
+        val heap = MinHeapSetWithCmp<Int>(n, compareBy { shortest[it] })
         shortest[src] = 0
-        while (que.isNotEmpty()) {
-            val (dis, v) = que.remove()
-            if(shortest[v] < dis) continue      // v has done
-            for ((u, e) in adj[v])
-                if (dis + e < shortest[u]) {  // shortest[v] == dis; no worry if u has done: dis+e >= shortest[u]
-                    shortest[u] = dis + e
-                    que.add(shortest[u] to u)
+        heap.add(src)
+        while (heap.isNotEmpty()) {
+            val v = heap.pop()
+            for ((u, e) in adj[v]) {
+                if (shortest[v] + e < shortest[u]) {
+                    shortest[u] = shortest[v] + e
+                    if (heap.exist(u))
+                        heap.decreaseKey(u)
+                    else
+                        heap.add(u)
                 }
+            }
         }
+//        val que = PriorityQueue<Pair<Int, Int>>(compareBy({ it.first }, { it.second }))
+//        que.add(0 to src)
+//        shortest[src] = 0
+//        while (que.isNotEmpty()) {
+//            val (dis, v) = que.remove()
+//            if(shortest[v] < dis) continue      // v has done
+//            for ((u, e) in adj[v])
+//                if (dis + e < shortest[u]) {  // shortest[v] == dis; no worry if u has done: dis+e >= shortest[u]
+//                    shortest[u] = dis + e
+//                    que.add(shortest[u] to u)
+//                }
+//        }
         return shortest
     }
 
