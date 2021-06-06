@@ -13,7 +13,25 @@ fun edgesToAdj(N: Int, edges: List<Pair<Int, Int>>, undirected: Boolean = false)
     return adj.map { it.toList() }
 }
 
-fun undirectedEdgesToAdj(edges: List<Pair<Int, Int>>) = edgesToAdj(edges.size + 1, edges, true)
+fun weightEdgesToAdj(
+    N: Int,                                     // 1-based
+    edges: List<Triple<Int, Int, Int>>,         // (from, to, dis)
+    undirected: Boolean = false
+): List<List<Pair<Int, Int>>> {
+    val adj = List(N + 1) { mutableListOf<Pair<Int, Int>>() }
+    for ((a, b, d) in edges) {
+        adj[a].add(b to d)
+        if (undirected)
+            adj[b].add(a to d)
+    }
+    return adj
+}
+
+fun undirectedEdgesToAdj(edges: List<Pair<Int, Int>>, N: Int = edges.size + 1) =
+    edgesToAdj(N, edges, true)
+
+fun undirectedWeightEdgesToAdj(edges: List<Triple<Int, Int, Int>>, N: Int = edges.size + 1) =
+    weightEdgesToAdj(N, edges, true)
 
 class TestGraphUtils {
     @Test
