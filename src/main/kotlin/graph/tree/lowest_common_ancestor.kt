@@ -73,6 +73,24 @@ class OnlineLCA(N: Int, root: Int, edges: List<Pair<Int, Int>>) {
     fun query(x: Int, y: Int) = node[rmq.query(first[x], first[y]).second]   //O(1)
 }
 
+class ByHeavyPathComposition(N: Int, root: Int, edges: List<Pair<Int, Int>>) {
+    val comp = HeavyLightDecomposition(edges, root, N)
+    val dep = comp.dep
+    val top = comp.top
+    val parent = comp.parent
+
+    fun lca(a: Int, b: Int): Int {
+        var (x, y) = a to b
+        while (top[x] != top[y]) { // go up one light-edge every time, O(log) light-edges parents in total, so O(log)
+            if (dep[top[x]] <= dep[top[y]])
+                y = parent[top[y]]
+            else
+                x = parent[top[x]]
+        }
+        return if (dep[x] <= dep[y]) x else y
+    }
+}
+
 class TestLowestCommonAncestor {
     val root = 1
     val N = 9
@@ -113,6 +131,15 @@ class TestLowestCommonAncestor {
         assertEquals(
             queriesAnswer.map { it.second },
             queriesAnswer.map { lca.query(it.first.first, it.first.second) }
+        )
+    }
+
+    @Test
+    fun testByHeavyPathComposition() {
+        val by_comp = ByHeavyPathComposition(N, root, edges)
+        assertEquals(
+            queriesAnswer.map { it.second },
+            queriesAnswer.map { by_comp.lca(it.first.first, it.first.second) }
         )
     }
 }
