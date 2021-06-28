@@ -120,6 +120,55 @@ fun inversionToPermutation(leftGreaterCount: List<Int>): List<Int> {
     return perm.toList()
 }
 
+open class NonRecursiveSegment(n: Int, val default_v: Int = 0) {
+    // segment: mapping to range [0, n)
+    val N: Int      // root is 1, left(x) = 2*x, right(x) = 2*x+1, parent(x) = x/2
+    val vs: MutableList<Int>
+
+    init {
+        var x = n
+        while (x and x - 1 != 0) x = x and x - 1
+        N = if (x < n) x * 2 else x       // minimal power of 2
+
+        vs = MutableList(N * 2) { default_v }
+    }
+
+    open fun merge(a: Int, b: Int) = a + b
+
+    fun query(ll: Int, rr: Int): Int {      // [l, r),
+        var (l, r) = ll + N to rr + N
+        var res = default_v
+        while (l < r) {
+            if (l % 2 == 1) { // l is right child
+                res = merge(res, vs[l])
+                l += 1
+            }
+            if (r % 2 == 1) {     // r-1 is left child
+                res = merge(res, vs[r - 1])
+                r -= 1
+            }
+            l /= 2
+            r /= 2
+        }
+        return res
+    }
+
+    fun update(pos: Int, v: Int) {
+        var i = pos + N
+        vs[i] = v
+        while (i > 1) {       // not root(has parent)
+            vs[i / 2] = merge(vs[i], vs[i xor 1])
+            i /= 2
+        }
+    }
+
+    fun build(values: List<Int>) {
+        for ((i, v) in values.withIndex()) vs[N + i] = v
+        for (i in N - 1 downTo 1)
+            vs[i] = merge(vs[i * 2], vs[i * 2 + 1])
+    }
+}
+
 class TestSegmentTree {
     @Test
     fun testCounterKth() {
@@ -177,5 +226,36 @@ class TestSegmentTree {
         assertEquals(MinCountNode(2, 1), seg.query(0..3))
         seg.update(0, 2)
         assertEquals(MinCountNode(2, 3), seg.query(0..5))
+    }
+
+    @Test
+    fun testNonRecursiveSegment() {
+        class MaxSegment(n: Int) : NonRecursiveSegment(n, Int.MIN_VALUE) {
+            override fun merge(a: Int, b: Int) = maxOf(a, b)
+        }
+
+        val n = 11
+        val tree = MaxSegment(n)
+
+        val arr = (0 until n).toMutableList()
+        tree.build(arr)
+
+        fun validate() {
+            for (l in 0 until n)
+                for (r in l until n)
+                    assertEquals(arr.subList(l, r + 1).maxOrNull(), tree.query(l, r + 1))
+        }
+        validate()
+
+        arr[3] = 9
+        tree.update(3, 9)
+
+        arr[5] = 100
+        tree.update(5, 100)
+        for (i in 8 until n) {
+            arr[i] = -1
+            tree.update(i, -1)
+        }
+        validate()
     }
 }
