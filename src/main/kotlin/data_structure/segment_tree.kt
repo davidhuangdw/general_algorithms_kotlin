@@ -136,16 +136,16 @@ open class NonRecursiveSegment(n: Int, val default_v: Int = 0) {
     open fun merge(a: Int, b: Int) = a + b
 
     fun query(ll: Int, rr: Int): Int {      // [l, r),
-        var (l, r) = ll + N to rr + N
+        var (l, r) = ll + N to rr + N - 1  // [l, r]
         var res = default_v
-        while (l < r) {
-            if (l % 2 == 1) { // l is right child
+        while (l <= r) { // when equal, extract one of them will be merged
+            if (l % 2 == 1) {
                 res = merge(res, vs[l])
-                l += 1
+                l ++
             }
-            if (r % 2 == 1) {     // r-1 is left child
-                res = merge(res, vs[r - 1])
-                r -= 1
+            if (r % 2 == 0) {
+                res = merge(res, vs[r])
+                r --
             }
             l /= 2
             r /= 2
